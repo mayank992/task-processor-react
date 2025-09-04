@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+yarn.lock
+package-lock.json
+
+# Build output
+build/
+dist/
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Other
+*.min.js
+*.min.css
