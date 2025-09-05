@@ -7,15 +7,12 @@ import { TaskTable } from './components/taskTable';
 
 // hooks
 import { useTaskManager } from './hooks/useTaskManager';
-import { useTaskScheduler } from './hooks/useTaskScheduler';
 
 // styles
 import './styles.css';
 
 const App = (): ReactElement => {
-  const { tasks, addTask, cancelTask, executeTask } = useTaskManager();
-
-  useTaskScheduler({ tasks, executeTask });
+  const { tasks, addTask, cancelTask } = useTaskManager();
 
   return (
     <div className="App">

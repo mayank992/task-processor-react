@@ -4,9 +4,9 @@ import { useCallback } from 'react';
 // types
 import { Task } from '../types';
 
-/**
- * Custom hook for managing tasks
- */
+// constants
+import { TaskPriority, TaskStatus, MAX_RUNNING_TASKS } from '../constants';
+
 export const useTaskManager = () => {
   const tasks: Task[] = [];
 
@@ -18,14 +18,9 @@ export const useTaskManager = () => {
     console.log('TODO: Implement cancelTask', taskId);
   }, []);
 
-  const executeTask = useCallback(async (task: Task) => {
-    console.log('TODO: Implement executeTask', task);
-  }, []);
-
   return {
     tasks,
     addTask,
     cancelTask,
-    executeTask,
   };
 };

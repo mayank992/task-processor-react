@@ -84,6 +84,7 @@ describe('Milestone 4: Dependencies', () => {
     await addTask({ user }); // Task 1
     await addTask({ user, dependencies: ['Task 1'] }); // Task 2
     await addTask({ user, dependencies: ['Task 2'] }); // Task 3
+    await addTask({ user, dependencies: ['Task 3'] }); // Task 4
 
     const cancelButtons = screen.getAllByText('Cancel');
     await user.click(cancelButtons[0]); // Cancel Task 2
@@ -92,7 +93,7 @@ describe('Milestone 4: Dependencies', () => {
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.CANCELLED)).toEqual(['Task 2', 'Task 3']);
+      expect(getTasksByStatus(TaskStatus.CANCELLED)).toEqual(['Task 2', 'Task 3', 'Task 4']);
     });
   });
 
@@ -102,11 +103,12 @@ describe('Milestone 4: Dependencies', () => {
     await addTask({ user, fail: true }); // Task 1
     await addTask({ user, dependencies: ['Task 1'] }); // Task 2
     await addTask({ user, dependencies: ['Task 2'] }); // Task 3
+    await addTask({ user, dependencies: ['Task 3'] }); // Task 4
 
     act(() => jest.advanceTimersByTime(5000));
 
     await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.FAILED)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+      expect(getTasksByStatus(TaskStatus.FAILED)).toEqual(['Task 1', 'Task 2', 'Task 3', 'Task 4']);
     });
   });
 
