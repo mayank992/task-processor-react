@@ -52,7 +52,7 @@ Handle max concurrent tasks.
 
 ### **Milestone 3: Priority, Cancellation (25 marks)**
 
-Handle task priority, failure and cancellation.
+Handle task priority and cancellation.
 
 **Requirements:**
 
@@ -63,7 +63,7 @@ Handle task priority, failure and cancellation.
 
 ### **Milestone 4: Dependencies (25 marks)**
 
-Handle task dependencies (you can assume there won't be circular dependencies)
+Handle task dependencies
 
 **Requirements:**
 
