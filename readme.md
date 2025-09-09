@@ -73,3 +73,11 @@ Handle task dependencies
 - **Start simple**: Get basic functionality working before adding complexity.
 - **Test frequently**: Use the test suite to validate your implementation.
 - **Think incrementally**: Each milestone builds on the previous.
+
+## 🧪 Running Tests
+
+To run the test suite:
+
+```bash
+yarn test
+```
