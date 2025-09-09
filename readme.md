@@ -66,7 +66,7 @@ Handle task dependencies
 
 **Requirements:**
 
-- A task starts only when all dependencies have completed successfully.
+- A task starts only when all dependencies have completed.
 
 ## 💡 Implementation Tips
 
