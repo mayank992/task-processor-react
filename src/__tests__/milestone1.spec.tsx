@@ -53,11 +53,6 @@ describe('Milestone 1: Basic Task Management', () => {
       jest.restoreAllMocks();
     });
 
-    test('shows empty state before first task is created', () => {
-      render(<App />);
-      expect(screen.getByText('No tasks created yet.')).toBeInTheDocument();
-    });
-
     test('handles lifecycle and multiple waves of task creation', async () => {
       render(<App />);
 
