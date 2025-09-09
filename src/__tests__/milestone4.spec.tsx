@@ -1,5 +1,5 @@
 // libs
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -8,7 +8,7 @@ import App from '../App';
 
 // helpers
 import { resetTaskCounter } from '../components/taskForm/helpers';
-import { getTasksByStatus, addTask } from './utils';
+import { getTasksByStatus, addTask, advance } from './utils';
 
 // constants
 import { TaskPriority, TaskStatus } from '../constants';
@@ -20,18 +20,15 @@ import { TaskPriority, TaskStatus } from '../constants';
  *
  * Requirements:
  * - A task starts only when all dependencies have completed successfully
- * - If a dependency is canceled, cancel all dependents
- * - If a dependency is failed, mark all dependents as failed
  */
 
-describe('Milestone 4: Dependencies', () => {
+describe('Milestone 4: Task Dependencies', () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
     resetTaskCounter();
     jest.useFakeTimers();
     user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    jest.spyOn(Math, 'random');
   });
 
   afterEach(() => {
@@ -50,7 +47,7 @@ describe('Milestone 4: Dependencies', () => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2']);
     });
 
-    act(() => jest.advanceTimersByTime(5000));
+    advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
@@ -70,45 +67,11 @@ describe('Milestone 4: Dependencies', () => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 3']);
     });
 
-    act(() => jest.advanceTimersByTime(5000));
+    advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
       expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 3']);
-    });
-  });
-
-  test('should cancel dependent tasks when dependency is cancelled', async () => {
-    render(<App />);
-
-    await addTask({ user }); // Task 1
-    await addTask({ user, dependencies: ['Task 1'] }); // Task 2
-    await addTask({ user, dependencies: ['Task 2'] }); // Task 3
-    await addTask({ user, dependencies: ['Task 3'] }); // Task 4
-
-    const cancelButtons = screen.getAllByText('Cancel');
-    await user.click(cancelButtons[0]); // Cancel Task 2
-
-    act(() => jest.advanceTimersByTime(5000));
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.CANCELLED)).toEqual(['Task 2', 'Task 3', 'Task 4']);
-    });
-  });
-
-  test('should fail dependent tasks when dependency fails', async () => {
-    render(<App />);
-
-    await addTask({ user, fail: true }); // Task 1
-    await addTask({ user, dependencies: ['Task 1'] }); // Task 2
-    await addTask({ user, dependencies: ['Task 2'] }); // Task 3
-    await addTask({ user, dependencies: ['Task 3'] }); // Task 4
-
-    act(() => jest.advanceTimersByTime(5000));
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.FAILED)).toEqual(['Task 1', 'Task 2', 'Task 3', 'Task 4']);
     });
   });
 
@@ -124,7 +87,7 @@ describe('Milestone 4: Dependencies', () => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2', 'Task 3']);
     });
 
-    act(() => jest.advanceTimersByTime(5000));
+    advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
@@ -132,7 +95,7 @@ describe('Milestone 4: Dependencies', () => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 3']);
     });
 
-    act(() => jest.advanceTimersByTime(5000));
+    advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
@@ -155,7 +118,7 @@ describe('Milestone 4: Dependencies', () => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6']);
     });
 
-    act(() => jest.advanceTimersByTime(5000));
+    advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);

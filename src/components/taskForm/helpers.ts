@@ -12,17 +12,10 @@ export const resetTaskCounter = () => {
 };
 
 const execute = () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const executionTime = 5000; // 5 seconds
 
-    setTimeout(() => {
-      // Simulate some tasks failing (10% failure rate)
-      if (Math.random() > 0.9) {
-        reject(new Error('Task execution failed'));
-      } else {
-        resolve(undefined);
-      }
-    }, executionTime);
+    setTimeout(() => resolve(undefined), executionTime);
   });
 };
 

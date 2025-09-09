@@ -9,7 +9,6 @@ import { TASK_PRIORITY_VS_LABEL, TASK_STATUS_VS_LABEL, TaskPriority, TaskStatus 
 
 type TaskTableProps = {
   tasks: Task[];
-  onCancelTask?: (taskId: string) => void;
 };
 
 const StatusBadge = ({ status }: { status: TaskStatus }) => (
@@ -24,7 +23,7 @@ const PriorityBadge = ({ priority }: { priority: TaskPriority }) => (
   </span>
 );
 
-export const TaskTable = ({ tasks, onCancelTask }: TaskTableProps) => (
+export const TaskTable = ({ tasks }: TaskTableProps) => (
   <div className="task-table">
     <h2 className="task-table-title">
       Tasks {tasks.length > 0 && <span className="task-count">({tasks.length})</span>}
@@ -44,7 +43,6 @@ export const TaskTable = ({ tasks, onCancelTask }: TaskTableProps) => (
             <th>Priority</th>
             <th>Dependencies</th>
             <th>Status</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -68,13 +66,6 @@ export const TaskTable = ({ tasks, onCancelTask }: TaskTableProps) => (
               </td>
               <td>
                 <StatusBadge status={status} />
-              </td>
-              <td>
-                {onCancelTask && status === TaskStatus.PENDING ? (
-                  <button onClick={() => onCancelTask(id)} data-action="cancel">
-                    Cancel
-                  </button>
-                ) : null}
               </td>
             </tr>
           ))}

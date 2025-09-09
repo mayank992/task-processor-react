@@ -1,5 +1,5 @@
 // libs
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -8,7 +8,7 @@ import App from '../App';
 
 // helpers
 import { resetTaskCounter } from '../components/taskForm/helpers';
-import { addTask, getTasksByStatus } from './utils';
+import { addTask, getTasksByStatus, advance } from './utils';
 
 // constants
 import { TaskStatus } from '../constants';
@@ -21,7 +21,7 @@ import { TaskStatus } from '../constants';
  * Requirements:
  * - Create tasks through the form and add to state
  * - Execute tasks immediately when created
- * - Update task status: PENDING → RUNNING → COMPLETED/FAILED
+ * - Update task status: PENDING → RUNNING → COMPLETED
  * - Display real-time status in the UI
  */
 
@@ -32,7 +32,6 @@ describe('Milestone 1: Basic Task Management', () => {
     resetTaskCounter();
     jest.useFakeTimers();
     user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    jest.spyOn(Math, 'random');
   });
 
   afterEach(() => {
@@ -40,59 +39,64 @@ describe('Milestone 1: Basic Task Management', () => {
     jest.restoreAllMocks();
   });
 
-  test('should create and add tasks to state with correct initial properties', async () => {
-    render(<App />);
+  describe('Milestone 1: Basic Task Management', () => {
+    let user: ReturnType<typeof userEvent.setup>;
 
-    // Initial state - no tasks
-    expect(screen.getByText('No tasks created yet.')).toBeInTheDocument();
-
-    // Create first task
-    await addTask({ user });
-
-    await waitFor(() => expect(screen.queryByText('No tasks created yet.')).not.toBeInTheDocument());
-
-    // Task 1 should be running
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]);
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual([]);
-    });
-  });
-
-  test('should follow complete status transition: PENDING → RUNNING → COMPLETED', async () => {
-    render(<App />);
-
-    await addTask({ user });
-
-    // Complete execution: RUNNING → COMPLETED
-    act(() => {
-      jest.advanceTimersByTime(5000);
+    beforeEach(() => {
+      resetTaskCounter();
+      jest.useFakeTimers();
+      user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     });
 
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]);
-    });
-  });
-
-  test('should handle multiple tasks with independent execution and failure case', async () => {
-    render(<App />);
-
-    // Create 3 tasks, with one forced to fail
-    await addTask({ user });
-    await addTask({ user });
-    await addTask({ user, fail: true });
-
-    // Complete all tasks
-    act(() => {
-      jest.advanceTimersByTime(20000);
+    afterEach(() => {
+      jest.useRealTimers();
+      jest.restoreAllMocks();
     });
 
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
-      expect(getTasksByStatus(TaskStatus.FAILED)).toEqual(['Task 3']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
+    test('shows empty state before first task is created', () => {
+      render(<App />);
+      expect(screen.getByText('No tasks created yet.')).toBeInTheDocument();
+    });
+
+    test('handles lifecycle and multiple waves of task creation', async () => {
+      render(<App />);
+
+      // Wave 1: add 2 tasks
+      await addTask({ user });
+      await addTask({ user });
+
+      await waitFor(() => {
+        expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2']);
+      });
+
+      // Wave 2: add 1 more while others are still running
+      await addTask({ user });
+      await waitFor(() => {
+        expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+      });
+
+      // Finish first 3
+      advance(5000);
+
+      await waitFor(() => {
+        expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+        expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
+      });
+
+      // Wave 3: add 2 more after batch completed
+      await addTask({ user });
+      await addTask({ user });
+
+      await waitFor(() => {
+        expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 5']);
+      });
+
+      advance(5000);
+
+      await waitFor(() => {
+        expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2', 'Task 3', 'Task 4', 'Task 5']);
+        expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
+      });
     });
   });
 });

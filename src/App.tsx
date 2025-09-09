@@ -12,13 +12,13 @@ import { useTaskManager } from './hooks/useTaskManager';
 import './styles.css';
 
 const App = (): ReactElement => {
-  const { tasks, addTask, cancelTask } = useTaskManager();
+  const { tasks, addTask } = useTaskManager();
 
   return (
     <div className="App">
       <h1>Task Processor</h1>
       <TaskForm tasks={tasks} onAddTask={addTask} />
-      <TaskTable tasks={tasks} onCancelTask={cancelTask} />
+      <TaskTable tasks={tasks} />
     </div>
   );
 };

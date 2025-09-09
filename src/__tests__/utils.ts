@@ -1,5 +1,5 @@
 // libs
-import { screen, within } from '@testing-library/react';
+import { screen, within, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 // constants
@@ -17,20 +17,15 @@ const selectPriority = async (user: ReturnType<typeof userEvent.setup>, priority
 
 export const addTask = async ({
   user,
-  fail,
   dependencies,
   priority = TaskPriority.LOW,
 }: {
-  fail?: boolean;
   priority?: TaskPriority;
   dependencies?: string[];
   user: ReturnType<typeof userEvent.setup>;
 }) => {
   // select priority
   await selectPriority(user, priority);
-
-  // mock failure chance
-  (Math.random as jest.Mock).mockReturnValueOnce(fail ? 0.95 : 0.5);
 
   // Select dependencies if any
   if (dependencies?.length) {
@@ -59,3 +54,5 @@ export const getTasksByStatus = (status: TaskStatus) => {
     return row?.querySelector('.task-id')?.textContent?.trim() || '';
   });
 };
+
+export const advance = (ms: number) => act(() => jest.advanceTimersByTime(ms));

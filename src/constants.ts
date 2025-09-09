@@ -8,9 +8,7 @@ export enum TaskPriority {
 export enum TaskStatus {
   PENDING = 'PENDING',
   RUNNING = 'RUNNING',
-  CANCELLED = 'CANCELLED',
   COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
 }
 
 export const TASK_PRIORITY_VS_LABEL: Record<TaskPriority, string> = {
@@ -21,7 +19,5 @@ export const TASK_PRIORITY_VS_LABEL: Record<TaskPriority, string> = {
 export const TASK_STATUS_VS_LABEL: Record<TaskStatus, string> = {
   [TaskStatus.PENDING]: 'Pending',
   [TaskStatus.RUNNING]: 'Running',
-  [TaskStatus.CANCELLED]: 'Cancelled',
   [TaskStatus.COMPLETED]: 'Completed',
-  [TaskStatus.FAILED]: 'Failed',
 };

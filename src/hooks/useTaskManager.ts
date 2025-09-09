@@ -14,13 +14,8 @@ export const useTaskManager = () => {
     console.log('TODO: Implement addTask', task);
   }, []);
 
-  const cancelTask = useCallback((taskId: string) => {
-    console.log('TODO: Implement cancelTask', taskId);
-  }, []);
-
   return {
     tasks,
     addTask,
-    cancelTask,
   };
 };

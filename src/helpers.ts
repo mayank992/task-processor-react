@@ -9,10 +9,6 @@ export const getStatusIcon = (status: TaskStatus): string => {
       return '🔄';
     case TaskStatus.COMPLETED:
       return '✅';
-    case TaskStatus.FAILED:
-      return '❌';
-    case TaskStatus.CANCELLED:
-      return '🚫';
     default:
       throw new Error(`Invalid status: ${status}`);
   }

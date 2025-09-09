@@ -19,7 +19,7 @@ The project includes:
 
 - Pre-built UI components (`TaskForm`, `TaskTable`)
 - TypeScript types and constants
-- Mock task execution with random delays (2-10 seconds)
+- Mock task execution with 5 second delay
 - Jest tests for each milestone (all failing initially)
 
 ## 🏆 Milestones (4 × 25 marks each)
@@ -32,7 +32,7 @@ Handle state, execute tasks immediately and sync task status.
 
 - Create tasks through the form and add to state.
 - Execute tasks immediately when created.
-- Update task status: PENDING → RUNNING → COMPLETED/FAILED.
+- Update task status: PENDING → RUNNING → COMPLETED.
 - Display real-time status in the UI.
 
 ---
@@ -50,14 +50,13 @@ Handle max concurrent tasks.
 
 ---
 
-### **Milestone 3: Priority, Cancellation (25 marks)**
+### **Milestone 3: Priority (25 marks)**
 
-Handle task priority and cancellation.
+Handle task priority.
 
 **Requirements:**
 
 - HIGH_PRIORITY tasks execute before NORMAL tasks.
-- Implement cancel functionality for PENDING tasks.
 
 ---
 
@@ -68,8 +67,6 @@ Handle task dependencies
 **Requirements:**
 
 - A task starts only when all dependencies have completed successfully.
-- If a dependency is canceled, cancel all dependents.
-- If a dependency is failed, mark all dependents as failed.
 
 ## 💡 Implementation Tips
 

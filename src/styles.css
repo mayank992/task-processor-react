@@ -78,14 +78,6 @@ button:hover {
   background-color: #2563eb;
 }
 
-button[data-action='cancel'] {
-  background-color: #ef4444;
-}
-
-button[data-action='cancel']:hover {
-  background-color: #dc2626;
-}
-
 /* Table */
 table {
   width: 100%;
@@ -141,16 +133,6 @@ tr:last-child td {
 .status-completed {
   background-color: #d1fae5;
   color: #065f46;
-}
-
-.status-failed {
-  background-color: #fee2e2;
-  color: #991b1b;
-}
-
-.status-cancelled {
-  background-color: #f3f4f6;
-  color: #4b5563;
 }
 
 /* Priority colors */
