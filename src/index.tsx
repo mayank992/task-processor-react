@@ -10,6 +10,6 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <React.StrictMode>
-    <App concurrency={CONCURRENCY_LIMIT} />
+    <App concurrencyLimit={CONCURRENCY_LIMIT} />
   </React.StrictMode>
 );
