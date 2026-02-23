@@ -41,28 +41,15 @@ export const TaskTable = ({ tasks }: TaskTableProps) => (
           <tr>
             <th>Task ID</th>
             <th>Priority</th>
-            <th>Dependencies</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          {tasks.map(({ id, priority, dependencies, status }) => (
+          {tasks.map(({ id, priority, status }) => (
             <tr key={id}>
               <td className="task-id">{id}</td>
               <td>
                 <PriorityBadge priority={priority} />
-              </td>
-              <td>
-                {dependencies.length > 0 ? (
-                  dependencies.map((dep, index) => (
-                    <span key={dep}>
-                      {dep}
-                      {index < dependencies.length - 1 && ', '}
-                    </span>
-                  ))
-                ) : (
-                  <span className="no-dependencies">None</span>
-                )}
               </td>
               <td>
                 <StatusBadge status={status} />

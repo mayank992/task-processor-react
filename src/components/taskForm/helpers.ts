@@ -19,15 +19,9 @@ const execute = () => {
   });
 };
 
-export const createTask = ({ priority, dependencies }: { priority: TaskPriority; dependencies: string[] }): Task => ({
+export const createTask = ({ priority }: { priority: TaskPriority }): Task => ({
   id: `Task ${taskId++}`,
   priority,
-  dependencies,
   status: TaskStatus.PENDING,
   execute,
 });
-
-export const getDependencyOptions = (tasks: Task[]) =>
-  tasks
-    .filter(task => task.status === TaskStatus.PENDING || task.status === TaskStatus.RUNNING)
-    .map(task => ({ value: task.id, label: task.id }));

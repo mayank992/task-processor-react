@@ -17,26 +17,13 @@ const selectPriority = async (user: ReturnType<typeof userEvent.setup>, priority
 
 export const addTask = async ({
   user,
-  dependencies,
   priority = TaskPriority.LOW,
 }: {
   priority?: TaskPriority;
-  dependencies?: string[];
   user: ReturnType<typeof userEvent.setup>;
 }) => {
   // select priority
   await selectPriority(user, priority);
-
-  // Select dependencies if any
-  if (dependencies?.length) {
-    for (const dep of dependencies) {
-      const dependencySelect = screen.getByLabelText('Task Dependencies');
-      await user.click(dependencySelect);
-
-      const depOption = within(screen.getByRole('listbox')).getByText(new RegExp(dep, 'i'));
-      await user.click(depOption);
-    }
-  }
 
   // click add task button
   await user.click(screen.getByText('Add Task'));

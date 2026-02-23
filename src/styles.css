@@ -177,12 +177,6 @@ tr:last-child td {
   color: #6b7280;
 }
 
-/* Dependencies */
-.no-dependencies {
-  color: #9ca3af;
-  font-style: italic;
-}
-
 /* Errors */
 .error {
   color: #b91c1c;

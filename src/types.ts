@@ -5,6 +5,5 @@ export type Task = {
   id: string;
   status: TaskStatus;
   priority: TaskPriority;
-  dependencies: string[];
   execute: () => Promise<any>;
 };
