@@ -8,21 +8,22 @@ import App from '../App';
 
 // helpers
 import { resetTaskCounter } from '../components/taskForm/helpers';
-import { getTasksByStatus, addTask, advance } from './utils';
+import { addTask, getTasksByStatus, advance } from './utils';
 
 // constants
 import { TaskPriority, TaskStatus } from '../constants';
 
 /**
- * MILESTONE 4: Dependencies (25 marks)
+ * MILESTONE 4: Priority (25 marks)
  *
- * Handle task dependencies (you can assume there won't be circular dependencies)
+ * Respect task priority when scheduling from the queue.
  *
  * Requirements:
- * - A task starts only when all dependencies have completed successfully
+ * - HIGH priority tasks execute before LOW priority tasks.
+ * - When multiple tasks are queued, HIGH priority tasks should be promoted first.
  */
 
-describe('Milestone 4: Task Dependencies', () => {
+describe('Milestone 4: Task Priority', () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
@@ -36,100 +37,31 @@ describe('Milestone 4: Task Dependencies', () => {
     jest.restoreAllMocks();
   });
 
-  test('should wait for dependencies before starting dependent tasks', async () => {
-    render(<App />);
+  test('should prioritize HIGH tasks over LOW tasks', async () => {
+    render(<App concurrencyLimit={3} />);
 
-    await addTask({ user }); // Task 1 - no dependencies, should start immediately
-    await addTask({ user, dependencies: ['Task 1'] }); // Task 2 - depends on Task 1, should wait
+    // Add 5 LOW priority tasks → first 3 run, last 2 queued
+    for (let i = 0; i < 5; i++) {
+      await addTask({ user }); // Default priority is LOW
+    }
+
+    // Add 2 HIGH priority tasks → should go to queue but with higher priority
+    await addTask({ user, priority: TaskPriority.HIGH }); // Task 6
+    await addTask({ user, priority: TaskPriority.HIGH }); // Task 7
 
     await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2']); // Task 2 waits for Task 1
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4', 'Task 5', 'Task 6', 'Task 7']);
     });
 
-    // Complete Task 1 → Task 2 should now be able to start
+    // Complete first batch → HIGH priority tasks (6,7) should be promoted before LOW (4,5)
     advance(5000);
 
     await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 2']); // Task 2 starts after Task 1 completes
-    });
-  });
-
-  test('should handle multiple dependencies correctly', async () => {
-    render(<App />);
-
-    await addTask({ user }); // Task 1 - no dependencies
-    await addTask({ user }); // Task 2 - no dependencies
-    await addTask({ user, dependencies: ['Task 1', 'Task 2'] }); // Task 3 - depends on BOTH Task 1 AND Task 2
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 3']); // Task 3 waits for both dependencies
-    });
-
-    // Complete both dependencies → Task 3 can now start
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 3']); // Task 3 starts only after BOTH dependencies complete
-    });
-  });
-
-  test('should handle complex dependency chains', async () => {
-    render(<App />);
-
-    await addTask({ user }); // Task 1 - no dependencies
-    await addTask({ user, dependencies: ['Task 1'] }); // Task 2 - depends on Task 1
-    await addTask({ user, dependencies: ['Task 2'] }); // Task 3 - depends on Task 2 (chain: 1→2→3)
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2', 'Task 3']); // Both wait in chain
-    });
-
-    // Complete Task 1 → Task 2 can start, Task 3 still waits
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 2']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 3']); // Task 3 still waits for Task 2
-    });
-
-    // Complete Task 2 → Task 3 can finally start
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 3']); // Task 3 starts last in the chain
-    });
-  });
-
-  test('should handle mixed priority with dependencies', async () => {
-    render(<App />);
-
-    await addTask({ user }); // Task 1, LOW - no dependencies, starts immediately
-    await addTask({ user, priority: TaskPriority.LOW, dependencies: ['Task 1'] }); // Task 2, LOW - depends on Task 1
-    await addTask({ user, priority: TaskPriority.LOW, dependencies: ['Task 1'] }); // Task 3, LOW - depends on Task 1
-    await addTask({ user, priority: TaskPriority.LOW, dependencies: ['Task 1'] }); // Task 4, LOW - depends on Task 1
-    await addTask({ user, priority: TaskPriority.LOW, dependencies: ['Task 1'] }); // Task 5, LOW - depends on Task 1
-    await addTask({ user, priority: TaskPriority.HIGH, dependencies: ['Task 1'] }); // Task 6, HIGH - depends on Task 1
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(expect.arrayContaining(['Task 1']));
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2', 'Task 3', 'Task 4', 'Task 5', 'Task 6']); // All wait for Task 1
-    });
-
-    // Complete Task 1 → HIGH priority Task 6 should be promoted first, along with 2 LOW priority tasks
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
-      // Task 6 (HIGH) gets priority over Tasks 4,5 (LOW) despite being created later
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 2', 'Task 3', 'Task 6']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4', 'Task 5']); // Lower priority tasks remain queued
+      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+      // Task 4 (LOW) gets one slot, but Tasks 6,7 (HIGH) get priority over Task 5 (LOW)
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 6', 'Task 7']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 5']); // Task 5 (LOW) remains queued
     });
   });
 });

@@ -7,7 +7,7 @@ import { Task } from '../types';
 // constants
 import { TaskPriority, TaskStatus } from '../constants';
 
-export const useTaskManager = ({ concurrencyLimit }: { concurrencyLimit: number }) => {
+export const useTaskManager = ({ concurrencyLimit }: { concurrencyLimit?: number }) => {
   const tasks: Task[] = [];
 
   const addTask = useCallback((task: Task) => {

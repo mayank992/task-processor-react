@@ -14,18 +14,17 @@ import { addTask, getTasksByStatus, advance } from './utils';
 import { TaskStatus } from '../constants';
 
 /**
- * MILESTONE 2: Concurrency Control (25 marks)
+ * MILESTONE 2: Concurrency Limit = 1 (25 marks)
  *
- * Handle max concurrent tasks.
+ * Only one task may run at a time.
  *
  * Requirements:
- * - Implement CONCURRENCY_LIMIT = 3 limit
- * - Queue tasks when all slots are occupied
- * - Automatically start queued tasks when slots become available
+ * - Queue tasks when one is already running
+ * - When the running task completes, start the next from the queue
  * - Maintain proper status transitions
  */
 
-describe('Milestone 2: Concurrency Control', () => {
+describe('Milestone 2: Concurrency Limit = 1', () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
@@ -39,62 +38,42 @@ describe('Milestone 2: Concurrency Control', () => {
     jest.restoreAllMocks();
   });
 
-  test('handles concurrency with tasks added in multiple waves', async () => {
-    render(<App />);
+  test('only one task runs at a time; others queue and start when slot frees', async () => {
+    render(<App concurrencyLimit={1} />);
 
-    // Wave 1: Add 4 tasks → only first 3 can run due to CONCURRENCY_LIMIT = 3
-    for (let i = 0; i < 4; i++) await addTask({ user });
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2', 'Task 3']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4']); // Task 4 queued
-    });
-
-    // Wave 2: Add 3 more while first ones are still running → all go to queue
-    for (let i = 0; i < 3; i++) await addTask({ user });
+    // Add 3 tasks → only 1 can run (limit = 1)
+    await addTask({ user });
+    await addTask({ user });
+    await addTask({ user });
 
     await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4', 'Task 5', 'Task 6', 'Task 7']);
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 2', 'Task 3']);
     });
 
-    // Step 1: First batch finishes → 3 slots become available → next 3 tasks promoted
+    // Complete Task 1 → Task 2 should start (still only 1 running)
+    advance(5000);
+
+    await waitFor(() => {
+      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1']);
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 2']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 3']);
+    });
+
+    // Complete Task 2 → Task 3 should start
+    advance(5000);
+
+    await waitFor(() => {
+      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2']);
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 3']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]);
+    });
+
+    // Complete Task 3 → all done
     advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2', 'Task 3']);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 5', 'Task 6']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 7']); // Only Task 7 remains queued
-    });
-
-    // Step 2: Second batch finishes → last pending task promoted
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual([
-        'Task 1',
-        'Task 2',
-        'Task 3',
-        'Task 4',
-        'Task 5',
-        'Task 6',
-      ]);
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 7']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]); // Queue is empty
-    });
-
-    // Step 3: Last task finishes → all tasks completed
-    advance(5000);
-
-    await waitFor(() => {
-      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual([
-        'Task 1',
-        'Task 2',
-        'Task 3',
-        'Task 4',
-        'Task 5',
-        'Task 6',
-        'Task 7',
-      ]);
       expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]);
     });

@@ -1,5 +1,5 @@
 // libs
-import { render, waitFor, act } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
@@ -11,19 +11,20 @@ import { resetTaskCounter } from '../components/taskForm/helpers';
 import { addTask, getTasksByStatus, advance } from './utils';
 
 // constants
-import { TaskPriority, TaskStatus } from '../constants';
+import { TaskStatus } from '../constants';
 
 /**
- * Milestone 3: Priority (25 marks)
+ * MILESTONE 3: Concurrency Limit > 1 (25 marks)
  *
- * Handle task priority.
+ * Allow multiple tasks to run at once.
  *
  * Requirements:
- * - HIGH priority tasks execute before LOW priority tasks.
- * - When multiple tasks are queued, HIGH priority tasks should be promoted first.
+ * - Queue tasks when all slots are occupied
+ * - When a slot frees up, start the next task from the queue
+ * - Maintain proper status transitions
  */
 
-describe('Milestone 3: Task Priority', () => {
+describe('Milestone 3: Concurrency Limit > 1', () => {
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
@@ -37,31 +38,64 @@ describe('Milestone 3: Task Priority', () => {
     jest.restoreAllMocks();
   });
 
-  test('should prioritize HIGH tasks over LOW tasks', async () => {
-    render(<App />);
+  test('handles concurrency with tasks added in multiple waves', async () => {
+    render(<App concurrencyLimit={3} />);
 
-    // Add 5 LOW priority tasks → first 3 run, last 2 queued
-    for (let i = 0; i < 5; i++) {
-      await addTask({ user }); // Default priority is LOW
-    }
-
-    // Add 2 HIGH priority tasks → should go to queue but with higher priority
-    await addTask({ user, priority: TaskPriority.HIGH }); // Task 6
-    await addTask({ user, priority: TaskPriority.HIGH }); // Task 7
+    // Wave 1: Add 4 tasks → only first 3 can run due to concurrency limit = 3
+    for (let i = 0; i < 4; i++) await addTask({ user });
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2', 'Task 3']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4']); // Task 4 queued
+    });
+
+    // Wave 2: Add 3 more while first ones are still running → all go to queue
+    for (let i = 0; i < 3; i++) await addTask({ user });
+
+    await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 4', 'Task 5', 'Task 6', 'Task 7']);
     });
 
-    // Complete first batch → HIGH priority tasks (6,7) should be promoted before LOW (4,5)
+    // Step 1: First batch finishes → 3 slots become available → next 3 tasks promoted
     advance(5000);
 
     await waitFor(() => {
       expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual(['Task 1', 'Task 2', 'Task 3']);
-      // Task 4 (LOW) gets one slot, but Tasks 6,7 (HIGH) get priority over Task 5 (LOW)
-      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 6', 'Task 7']);
-      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 5']); // Task 5 (LOW) remains queued
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 5', 'Task 6']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual(['Task 7']); // Only Task 7 remains queued
+    });
+
+    // Step 2: Second batch finishes → last pending task promoted
+    advance(5000);
+
+    await waitFor(() => {
+      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual([
+        'Task 1',
+        'Task 2',
+        'Task 3',
+        'Task 4',
+        'Task 5',
+        'Task 6',
+      ]);
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 7']);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]); // Queue is empty
+    });
+
+    // Step 3: Last task finishes → all tasks completed
+    advance(5000);
+
+    await waitFor(() => {
+      expect(getTasksByStatus(TaskStatus.COMPLETED)).toEqual([
+        'Task 1',
+        'Task 2',
+        'Task 3',
+        'Task 4',
+        'Task 5',
+        'Task 6',
+        'Task 7',
+      ]);
+      expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
+      expect(getTasksByStatus(TaskStatus.PENDING)).toEqual([]);
     });
   });
 });
