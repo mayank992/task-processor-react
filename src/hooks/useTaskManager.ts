@@ -14,6 +14,10 @@ export const useTaskManager = () => {
     console.log('TODO: Implement addTask', task);
   }, []);
 
+  const executeTask = useCallback(async (task: Task) => {
+    console.log('TODO: Implement executeTask', task);
+  }, []);
+
   return {
     tasks,
     addTask,

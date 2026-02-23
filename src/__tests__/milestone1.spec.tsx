@@ -56,21 +56,22 @@ describe('Milestone 1: Basic Task Management', () => {
     test('handles lifecycle and multiple waves of task creation', async () => {
       render(<App />);
 
-      // Wave 1: add 2 tasks
+      // Wave 1: add 2 tasks - should start immediately since no concurrency limit yet
       await addTask({ user });
       await addTask({ user });
 
+      // Both tasks should transition from PENDING to RUNNING immediately
       await waitFor(() => {
         expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2']);
       });
 
-      // Wave 2: add 1 more while others are still running
+      // Wave 2: add 1 more while others are still running - should also start immediately
       await addTask({ user });
       await waitFor(() => {
         expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 1', 'Task 2', 'Task 3']);
       });
 
-      // Finish first 3
+      // Advance time by 5 seconds to complete all running tasks
       advance(5000);
 
       await waitFor(() => {
@@ -78,7 +79,7 @@ describe('Milestone 1: Basic Task Management', () => {
         expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual([]);
       });
 
-      // Wave 3: add 2 more after batch completed
+      // Wave 3: add 2 more after previous batch completed - should start immediately
       await addTask({ user });
       await addTask({ user });
 
@@ -86,6 +87,7 @@ describe('Milestone 1: Basic Task Management', () => {
         expect(getTasksByStatus(TaskStatus.RUNNING)).toEqual(['Task 4', 'Task 5']);
       });
 
+      // Complete the final batch
       advance(5000);
 
       await waitFor(() => {

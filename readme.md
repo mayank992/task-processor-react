@@ -56,7 +56,8 @@ Handle task priority.
 
 **Requirements:**
 
-- HIGH_PRIORITY tasks execute before NORMAL tasks.
+- HIGH priority tasks execute before LOW priority tasks.
+- When multiple tasks are queued, HIGH priority tasks should be promoted first.
 
 ---
 
@@ -68,7 +69,14 @@ Handle task dependencies
 
 - A task starts only when all dependencies have completed.
 
-## 💡 Implementation Tips
+## 🏗️ Implementation Guide
+
+**Core Implementation Location:**
+
+- Implement your task management logic in `src/hooks/useTaskManager.ts`
+- The hook should manage task state, execution queue, and status updates
+
+**💡 Implementation Tips:**
 
 - **Start simple**: Get basic functionality working before adding complexity.
 - **Test frequently**: Use the test suite to validate your implementation.

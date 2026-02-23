@@ -2,7 +2,7 @@
 import type { Task } from '../../types';
 
 // constants
-import { TaskStatus, TaskPriority, TASK_PRIORITY_VS_LABEL } from '../../constants';
+import { TaskStatus, TaskPriority } from '../../constants';
 
 let taskId = 1;
 
