@@ -11,8 +11,8 @@ import { useTaskManager } from './hooks/useTaskManager';
 // styles
 import './styles.css';
 
-const App = (): ReactElement => {
-  const { tasks, addTask } = useTaskManager();
+const App = ({ concurrencyLimit }: { concurrencyLimit: number }): ReactElement => {
+  const { tasks, addTask } = useTaskManager({ concurrencyLimit });
 
   return (
     <div className="App">

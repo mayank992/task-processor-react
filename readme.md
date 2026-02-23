@@ -17,10 +17,28 @@ Your Task Processor will progressively implement:
 
 The project includes:
 
-- Pre-built UI components (`TaskForm`, `TaskTable`)
+- **Pre-built UI components** (`TaskForm`, `TaskTable`) - **No changes required**
+- **Hook structure** (`useTaskManager`) - **Implement the logic**
 - TypeScript types and constants
 - Mock task execution with 5 second delay
 - Jest tests for each milestone (all failing initially)
+
+## 🏗️ Implementation Guide
+
+**Core Implementation Location:**
+
+- Implement your task management logic in `src/hooks/useTaskManager.ts`
+
+**Key Considerations:**
+
+- Use `TaskStatus.PENDING → RUNNING → COMPLETED` transitions
+- **The `task.execute` function is async and takes 5 seconds to complete**
+
+## 💡 Implementation Tips
+
+- **Start simple**: Get basic functionality working before adding complexity.
+- **Test frequently**: Use the test suite to validate your implementation.
+- **Think incrementally**: Each milestone builds on the previous.
 
 ## 🏆 Milestones (4 × 25 marks each)
 
@@ -31,9 +49,8 @@ Handle state, execute tasks immediately and sync task status.
 **Requirements:**
 
 - Create tasks through the form and add to state.
-- Execute tasks immediately when created.
+- Execute created tasks using `task.execute()`.
 - Update task status: PENDING → RUNNING → COMPLETED.
-- Display real-time status in the UI.
 
 ---
 
@@ -43,7 +60,7 @@ Handle max concurrent tasks.
 
 **Requirements:**
 
-- Implement `MAX_RUNNING_TASKS = 3` limit.
+- Implement `CONCURRENCY_LIMIT = 3` limit.
 - Queue tasks when all slots are occupied.
 - Automatically start queued tasks when slots become available.
 - Maintain proper status transitions.
@@ -68,19 +85,6 @@ Handle task dependencies
 **Requirements:**
 
 - A task starts only when all dependencies have completed.
-
-## 🏗️ Implementation Guide
-
-**Core Implementation Location:**
-
-- Implement your task management logic in `src/hooks/useTaskManager.ts`
-- The hook should manage task state, execution queue, and status updates
-
-**💡 Implementation Tips:**
-
-- **Start simple**: Get basic functionality working before adding complexity.
-- **Test frequently**: Use the test suite to validate your implementation.
-- **Think incrementally**: Each milestone builds on the previous.
 
 ## 🧪 Running Tests
 

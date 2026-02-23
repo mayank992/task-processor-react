@@ -19,7 +19,7 @@ import { TaskStatus } from '../constants';
  * Handle max concurrent tasks.
  *
  * Requirements:
- * - Implement MAX_RUNNING_TASKS = 3 limit
+ * - Implement CONCURRENCY_LIMIT = 3 limit
  * - Queue tasks when all slots are occupied
  * - Automatically start queued tasks when slots become available
  * - Maintain proper status transitions
@@ -42,7 +42,7 @@ describe('Milestone 2: Concurrency Control', () => {
   test('handles concurrency with tasks added in multiple waves', async () => {
     render(<App />);
 
-    // Wave 1: Add 4 tasks → only first 3 can run due to MAX_RUNNING_TASKS = 3
+    // Wave 1: Add 4 tasks → only first 3 can run due to CONCURRENCY_LIMIT = 3
     for (let i = 0; i < 4; i++) await addTask({ user });
 
     await waitFor(() => {

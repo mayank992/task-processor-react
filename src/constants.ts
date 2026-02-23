@@ -1,4 +1,4 @@
-export const MAX_RUNNING_TASKS = 3;
+export const CONCURRENCY_LIMIT = 3;
 
 export enum TaskPriority {
   LOW = 'LOW',

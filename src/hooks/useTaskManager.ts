@@ -5,9 +5,9 @@ import { useCallback } from 'react';
 import { Task } from '../types';
 
 // constants
-import { TaskPriority, TaskStatus, MAX_RUNNING_TASKS } from '../constants';
+import { TaskPriority, TaskStatus } from '../constants';
 
-export const useTaskManager = () => {
+export const useTaskManager = ({ concurrencyLimit }: { concurrencyLimit: number }) => {
   const tasks: Task[] = [];
 
   const addTask = useCallback((task: Task) => {

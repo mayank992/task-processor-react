@@ -19,7 +19,8 @@ import { TaskPriority, TaskStatus } from '../constants';
  * Handle task priority.
  *
  * Requirements:
- * - HIGH_PRIORITY tasks execute before NORMAL tasks.
+ * - HIGH priority tasks execute before LOW priority tasks.
+ * - When multiple tasks are queued, HIGH priority tasks should be promoted first.
  */
 
 describe('Milestone 3: Task Priority', () => {

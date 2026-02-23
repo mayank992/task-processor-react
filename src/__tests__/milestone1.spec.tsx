@@ -19,10 +19,9 @@ import { TaskStatus } from '../constants';
  * Handle state, execute tasks immediately and sync task status.
  *
  * Requirements:
- * - Create tasks through the form and add to state
- * - Execute tasks immediately when created
- * - Update task status: PENDING → RUNNING → COMPLETED
- * - Display real-time status in the UI
+ * - Create tasks through the form and add to state.
+ * - Execute created tasks using `task.execute()`.
+ * - Update task status: PENDING → RUNNING → COMPLETED.
  */
 
 describe('Milestone 1: Basic Task Management', () => {
