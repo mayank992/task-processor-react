@@ -16,7 +16,7 @@ import { TaskStatus } from '../constants';
 /**
  * MILESTONE 1: Basic Task Management (25 marks)
  *
- * Basic task management: state and immediate execution.
+ * Task state and immediate execution (no concurrency limit).
  *
  * Requirements:
  * Store created tasks in state.

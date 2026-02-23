@@ -16,7 +16,7 @@ import { TaskStatus } from '../constants';
 /**
  * MILESTONE 3: Concurrency Limit > 1 (25 marks)
  *
- * Allow multiple tasks to run at once.
+ * Up to N tasks run at once; queue when full.
  *
  * Requirements:
  * - Queue tasks when all slots are occupied

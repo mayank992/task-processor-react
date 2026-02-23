@@ -40,7 +40,7 @@ The project includes:
 
 ### **Milestone 1: Basic Task Management (25 marks)**
 
-Basic task management: state and immediate execution.
+Task state and immediate execution (no concurrency limit).
 
 **Requirements:**
 
@@ -53,7 +53,7 @@ Basic task management: state and immediate execution.
 
 ### **Milestone 2: Concurrency Limit = 1 (25 marks)**
 
-Only one task may run at a time.
+Only one task runs at a time; others queue.
 
 **Requirements:**
 
@@ -65,7 +65,7 @@ Only one task may run at a time.
 
 ### **Milestone 3: Concurrency Limit > 1 (25 marks)**
 
-Allow multiple tasks to run at once.
+Up to N tasks run at once; queue when full.
 
 **Requirements:**
 
@@ -77,7 +77,7 @@ Allow multiple tasks to run at once.
 
 ### **Milestone 4: Priority (25 marks)**
 
-Respect task priority when scheduling from the queue.
+High-priority tasks run before low-priority when choosing from the queue.
 
 **Requirements:**
 

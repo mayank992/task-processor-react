@@ -16,7 +16,7 @@ import { TaskStatus } from '../constants';
 /**
  * MILESTONE 2: Concurrency Limit = 1 (25 marks)
  *
- * Only one task may run at a time.
+ * Only one task may run at a time; others queue.
  *
  * Requirements:
  * - Queue tasks when one is already running

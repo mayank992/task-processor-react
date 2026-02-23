@@ -16,7 +16,7 @@ import { TaskPriority, TaskStatus } from '../constants';
 /**
  * MILESTONE 4: Priority (25 marks)
  *
- * Respect task priority when scheduling from the queue.
+ * High-priority tasks run before low-priority when choosing from the queue.
  *
  * Requirements:
  * - HIGH priority tasks execute before LOW priority tasks.
